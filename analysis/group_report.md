@@ -1,35 +1,36 @@
-# Group Report — Lab 18: Production RAG
+# Group Report - Lab 18: Production RAG
 
-**Nhóm:** [Tên]  
-**Ngày:**
+**Nhom:** Ca nhan  
+**Ngay:** 18/08/2026
 
-## Thành viên & Phân công
+## Thanh vien & Phan cong
 
-| Tên | Module | Hoàn thành | Tests pass |
-|-----|--------|-----------|-----------|
-| | M1: Chunking | ☐ | /8 |
-| | M2: Hybrid Search | ☐ | /5 |
-| | M3: Reranking | ☐ | /5 |
-| | M4: Evaluation | ☐ | /4 |
+| Ten | Module | Hoan thanh | Tests pass |
+|-----|--------|------------|------------|
+| Nguyen Minh Duong | M1: Chunking | Done | 13/13 |
+| Nguyen Minh Duong | M2: Hybrid Search | Done | 5/5 |
+| Nguyen Minh Duong | M3: Reranking | Done | 5/5 |
+| Nguyen Minh Duong | M4: Evaluation | Done | 4/4 |
+| Nguyen Minh Duong | M5: Enrichment | Done | 10/10 |
 
-## Kết quả RAGAS
+## Ket qua RAGAS
 
-| Metric | Naive | Production | Δ |
-|--------|-------|-----------|---|
-| Faithfulness | | | |
-| Answer Relevancy | | | |
-| Context Precision | | | |
-| Context Recall | | | |
+| Metric | Naive | Production | Delta |
+|--------|------:|-----------:|------:|
+| Faithfulness | 1.0000 | 1.0000 | +0.0000 |
+| Answer Relevancy | 0.7628 | 0.7094 | -0.0534 |
+| Context Precision | 0.2193 | 0.2135 | -0.0058 |
+| Context Recall | 0.8601 | 0.8235 | -0.0366 |
 
 ## Key Findings
 
-1. **Biggest improvement:**
-2. **Biggest challenge:**
-3. **Surprise finding:**
+1. **Biggest improvement:** Pipeline production da co day du cac buoc M1-M5: hierarchical chunking, enrichment, hybrid search, reranking va evaluation/failure analysis.
+2. **Biggest challenge:** Cac cau hoi versioning va numeric multi-hop de bi lay nham chunk cu hoac chunk trung so tien.
+3. **Surprise finding:** Context recall kha cao nhung context precision thap, chung to he thong thuong lay du thong tin nhung con nhieu context nhieu.
 
-## Presentation Notes (5 phút)
+## Presentation Notes
 
-1. RAGAS scores (naive vs production):
-2. Biggest win — module nào, tại sao:
-3. Case study — 1 failure, Error Tree walkthrough:
-4. Next optimization nếu có thêm 1 giờ:
+1. RAGAS scores: faithfulness giu 1.0000, context recall production 0.8235.
+2. Biggest win: M2 + M3 giup pipeline chay khong can Docker bang fallback local, van giu interface BM25/Dense/RRF/Rerank.
+3. Case study: cau hoi doi mat khau bi nham v1.0 90 ngay thay vi v2.0 120 ngay do chua boost version hien hanh.
+4. Next optimization: them metadata version/status/effective_date va query decomposition cho cau hoi multi-hop.

@@ -1,8 +1,10 @@
 .env
+.venv/
 .DS_Store
 __pycache__/
 *.pyc
 .pytest_cache/
+pytest-cache-files-*/
 qdrant_data/
 *.egg-info/
-reports/*.json
+!reports/*.json
