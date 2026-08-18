@@ -1,7 +1,7 @@
 # Failure Analysis - Lab 18: Production RAG
 
-**Nhom:** Ca nhan  
-**Thanh vien:** Nguyen Minh Duong - implement M1, M2, M3, M4, M5
+**Nhóm:** Cá nhân  
+**Thành viên:** Nguyễn Minh Dương - implement M1, M2, M3, M4, M5
 
 ## RAGAS Scores
 
@@ -15,61 +15,61 @@
 ## Bottom-5 Failures
 
 ### #1
-- **Question:** Muon mua thiet bi tri gia 55 trieu can ai phe duyet?
-- **Expected:** Don hang tren 50.000.000 VND can Tong Giam doc (CEO) phe duyet.
-- **Got:** Chunk tra ve noi dung luu y mua sam thiet bi CNTT, nhung thieu dong nguong phe duyet tren 50 trieu.
+- **Question:** Muốn mua thiết bị trị giá 55 triệu cần ai phê duyệt?
+- **Expected:** Đơn hàng trên 50.000.000 VNĐ cần Tổng Giám đốc (CEO) phê duyệt.
+- **Got:** Chunk trả về nội dung lưu ý mua sắm thiết bị CNTT, nhưng thiếu dòng quy định ngưỡng phê duyệt trên 50 triệu.
 - **Worst metric:** context_precision
-- **Error Tree:** Output sai mot phan -> Context co lien quan nhung chua dung diem -> Query bi hut ve "thiet bi CNTT" hon la "55 trieu/phe duyet".
-- **Root cause:** Ranking lexical uu tien chunk co cum "thiet bi CNTT" thay vi chunk co bang nguong tien phe duyet.
-- **Suggested fix:** Them metadata category=procurement, uu tien numeric/range matching va rerank theo nguong tien.
+- **Error Tree:** Output sai một phần -> Context có liên quan nhưng chưa đúng điểm cần tìm -> Query bị hút về “thiết bị CNTT” hơn là “55 triệu/phê duyệt”.
+- **Root cause:** Ranking lexical ưu tiên chunk có cụm “thiết bị CNTT” thay vì chunk có bảng ngưỡng tiền phê duyệt.
+- **Suggested fix:** Thêm metadata `category=procurement`, ưu tiên numeric/range matching và rerank theo ngưỡng tiền.
 
 ### #2
-- **Question:** Can mua laptop 30 trieu cho nhan vien moi, ai phe duyet va can gi tu phong CNTT?
-- **Expected:** Director phe duyet, can xac nhan cau hinh ky thuat tu CNTT, kem it nhat 3 bao gia.
-- **Got:** Chunk dao tao 30 trieu bi lay nham vi trung so 30.000.000.
+- **Question:** Cần mua laptop 30 triệu cho nhân viên mới, ai phê duyệt và cần gì từ phòng CNTT?
+- **Expected:** Director phê duyệt, cần xác nhận cấu hình kỹ thuật từ CNTT, kèm ít nhất 3 báo giá.
+- **Got:** Chunk đào tạo 30 triệu bị lấy nhầm vì trùng số 30.000.000.
 - **Worst metric:** context_precision
-- **Error Tree:** Output sai -> Context sai domain -> Query multi-hop chua tach dieu kien laptop + 30 trieu + CNTT.
-- **Root cause:** Numeric overlap lam retrieval nham sang hoan chi dao tao.
-- **Suggested fix:** Query rewrite thanh cac sub-query: mua sam laptop, nguong 5-50 trieu, xac nhan CNTT.
+- **Error Tree:** Output sai -> Context sai domain -> Query multi-hop chưa tách điều kiện laptop + 30 triệu + CNTT.
+- **Root cause:** Numeric overlap làm retrieval nhầm sang chính sách hoàn chi đào tạo.
+- **Suggested fix:** Query rewrite thành các sub-query: mua sắm laptop, ngưỡng 5-50 triệu, xác nhận CNTT.
 
 ### #3
-- **Question:** Senior co 9 nam tham nien duoc nghi bao nhieu ngay phep nam va luong trong khoang nao?
-- **Expected:** 18 ngay phep; luong Senior P3-P4 la 20-35 trieu VND/thang.
-- **Got:** Chunk chinh sach nghi phep 2023, thieu bang luong Senior.
+- **Question:** Senior có 9 năm thâm niên được nghỉ bao nhiêu ngày phép năm và lương trong khoảng nào?
+- **Expected:** 18 ngày phép; lương Senior P3-P4 là 20-35 triệu VNĐ/tháng.
+- **Got:** Chunk chính sách nghỉ phép 2023, thiếu bảng lương Senior.
 - **Worst metric:** context_precision
-- **Error Tree:** Output thieu -> Context chi dung mot phan -> Query multi-hop can ghep nghi phep v2024 + bang luong.
-- **Root cause:** Retrieval top-3 chua bao phu du hai tai lieu can thiet.
-- **Suggested fix:** Tang recall theo sub-query va gom context theo parent document.
+- **Error Tree:** Output thiếu -> Context chỉ đúng một phần -> Query multi-hop cần ghép nghỉ phép v2024 + bảng lương.
+- **Root cause:** Retrieval top-3 chưa bao phủ đủ hai tài liệu cần thiết.
+- **Suggested fix:** Tăng recall theo sub-query và gom context theo parent document.
 
 ### #4
-- **Question:** Luong thu viec cua nhan vien Junior muc cao nhat la bao nhieu?
-- **Expected:** 85% x 20.000.000 = 17.000.000 VND/thang.
-- **Got:** Context co cong thuc 85% nhung thieu muc luong Junior cao nhat.
+- **Question:** Lương thử việc của nhân viên Junior mức cao nhất là bao nhiêu?
+- **Expected:** 85% x 20.000.000 = 17.000.000 VNĐ/tháng.
+- **Got:** Context có công thức 85% nhưng thiếu mức lương Junior cao nhất.
 - **Worst metric:** context_precision
-- **Error Tree:** Output thieu tinh toan -> Context thieu bang luong -> Query can numeric reasoning.
-- **Root cause:** Reranker local uu tien chunk thu viec hon chunk bang_luong_2024.
-- **Suggested fix:** Lay them context tu bang luong khi query co "Junior" va "cao nhat".
+- **Error Tree:** Output thiếu tính toán -> Context thiếu bảng lương -> Query cần numeric reasoning.
+- **Root cause:** Reranker local ưu tiên chunk thử việc hơn chunk `bang_luong_2024`.
+- **Suggested fix:** Lấy thêm context từ bảng lương khi query có “Junior” và “cao nhất”.
 
 ### #5
-- **Question:** Bao lau phai doi mat khau mot lan?
-- **Expected:** Theo v2.0 hien hanh la 120 ngay; v1.0 90 ngay da bi thay the.
-- **Got:** Chunk v1.0 90 ngay dung dau, chunk v2.0 nam o context sau.
+- **Question:** Bao lâu phải đổi mật khẩu một lần?
+- **Expected:** Theo v2.0 hiện hành là 120 ngày; v1.0 là 90 ngày nhưng đã bị thay thế.
+- **Got:** Chunk v1.0 với chu kỳ 90 ngày đứng đầu, chunk v2.0 nằm ở context sau.
 - **Worst metric:** context_precision
-- **Error Tree:** Output sai version -> Context co ca cu va moi -> Ranking khong uu tien version hien hanh.
-- **Root cause:** Chua co metadata/version filter va chua boost "hien hanh", "da thay the".
-- **Suggested fix:** Extract metadata version/status, filter bo tai lieu old khi cau hoi hoi chinh sach hien hanh.
+- **Error Tree:** Output sai version -> Context có cả bản cũ và bản mới -> Ranking không ưu tiên version hiện hành.
+- **Root cause:** Chưa có metadata/version filter và chưa boost các tín hiệu như “hiện hành”, “đã thay thế”.
+- **Suggested fix:** Extract metadata `version/status`, filter bỏ tài liệu cũ khi câu hỏi hỏi chính sách hiện hành.
 
 ## Case Study
 
-**Question chon phan tich:** Bao lau phai doi mat khau mot lan?
+**Question chọn phân tích:** Bao lâu phải đổi mật khẩu một lần?
 
 **Error Tree walkthrough:**
-1. Output dung? -> Chua dung, tra 90 ngay thay vi 120 ngay.
-2. Context dung? -> Co ca v1.0 va v2.0, nhung v1.0 dung dau.
-3. Query rewrite OK? -> Chua, can them y "chinh sach hien hanh".
-4. Fix o buoc: Retrieval/reranking bang metadata version.
+1. Output đúng? -> Chưa đúng, trả 90 ngày thay vì 120 ngày.
+2. Context đúng? -> Có cả v1.0 và v2.0, nhưng v1.0 đứng đầu.
+3. Query rewrite OK? -> Chưa, cần thêm ý “chính sách hiện hành”.
+4. Fix ở bước: Retrieval/reranking bằng metadata version.
 
-**Neu co them 1 gio, se optimize:**
-- Them metadata `version`, `effective_date`, `status`.
-- Boost tai lieu co "hien hanh", "v2.0", "thay the".
-- Tach query multi-hop thanh nhieu truy van nho roi hop nhat context.
+**Nếu có thêm 1 giờ, sẽ optimize:**
+- Thêm metadata `version`, `effective_date`, `status`.
+- Boost tài liệu có “hiện hành”, “v2.0”, “đã thay thế”.
+- Tách query multi-hop thành nhiều truy vấn nhỏ rồi hợp nhất context.
